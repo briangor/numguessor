@@ -26,7 +26,7 @@ At any guess prompt, type `quit` to return to the main menu.
 3. Run the installer
 4. Launch NumGuessor from the Start Menu or Desktop shortcut
 
-> **Requirements:** No Java installation needed — the JRE is bundled with the installer.
+> **Requirements:** No Java installation needed. The JRE is bundled with the installer.
 
 ---
 

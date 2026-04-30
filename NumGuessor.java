@@ -121,7 +121,7 @@ class NumGuessor {
 
 			if (guess < MIN_NUMBER || guess > MAX_NUMBER) {
 				System.out.println(">> The number is within the range of " + MIN_NUMBER + " to " + MAX_NUMBER
-						+ ". You still have " + (MAX_ATTEMPTS - attemptsUsed) + " attempts.\n");
+						+ ". You still have " + (MAX_ATTEMPTS - attemptsUsed) + " attempt(s).\n");
 				continue;
 			}
 
@@ -247,23 +247,3 @@ class NumGuessor {
 		flushScreen();
 	}
 }
-
-/**
- * # TODO:
- * 
- * 
- */
-
-/*
- * # FEATURES TO BE IMPLEMENTED LATER
- * - high score feature that tracks how many rounds the user has won
- * - Add a Score: Count how many attempts it took to win and display a "Rank"
- * (e.g., 1 attempt = "God Mode", 5 attempts = "Close Call").
- * - difficulty setting that changes the value of K/MAX_ATTEMPTS eg. 1-100 or
- * 1-1000.
- * - Implementing a hint system (e.g., "You're getting warmer!").
- * 
- * ++
- * - Adding a timer to see how fast the user can guess.
- * - Saving a high score to a file so it persists even after the program closes.
- */
