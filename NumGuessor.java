@@ -72,43 +72,115 @@ class NumGuessor {
 
 	public static void guessNumber(Scanner input) {
 		// Generate a random number between 1 and 100
-		int number = 1 + (int) (100 * Math.random());
+		// int number = 1 + (int)(100 * Math.random());
 
 		// Number of attempts
-		final int K = 5;
+		// final int K = 5;
 
-		System.out.println("A number is chosen between 1 and 100.");
-		System.out.println("You have " + K + " attempts to guess the correct number");
+		boolean playAgain;
 
-		// Loop for K attempts
-		for (int i = 0; i < K; i++) {
-			System.out.print("Enter your guess: ");
-			int guess = input.nextInt();
+		/*
+		 * System.out.println("A number is chosen between 1 and 100.");
+		 * System.out.println("You have " + K +
+		 * " attempts to guess the correct number");
+		 * 
+		 * // Loop for K attempts -> refactored to a do-while loop to add playAgain
+		 * feature
+		 * for (int i = 0; i < K; i++) {
+		 * System.out.print("Enter your guess: ");
+		 * int guess = input.nextInt();
+		 * 
+		 * // Warn if count == 4
+		 * if (i == 3) {
+		 * System.out.println("\n Last chance remaining!");
+		 * }
+		 * 
+		 * // Check conditions
+		 * if (guess == number) {
+		 * System.out.println(" Congratulations! You guessed the correct number.\n");
+		 * 
+		 * // Exit if guessed correctly
+		 * return;
+		 * } else if ( guess < number) {
+		 * System.out.println(" The number is greater than " + guess);
+		 * } else {
+		 * System.out.println(" The number is less than " + guess);
+		 * }
+		 * }
+		 */
 
-			// Warn if count == 4
-			if (i == 3) {
-				System.out.println("\n Last chance remaining!");
+		do {
+			// Reset game state for a new round
+			// Generate a random number between 1 and 100
+			int number = 1 + (int) (100 * Math.random());
+
+			// Number of attempts
+			final int K = 5;
+
+			boolean won = false;
+
+			System.out.println("A number is chosen between 1 and 100.");
+			System.out.println("You have " + K + " attempts to guess the correct number");
+
+			// The guessing loop
+			for (int i = 0; i < K; i++) {
+				if (i == 4)
+					System.out.println("\nLast chance remaining!");
+
+				System.out.print("Enter your guess: ");
+				int guess = input.nextInt();
+
+				if (guess == number) {
+					System.out.println("Congratulations! You guessed it.\n");
+					won = true;
+					break;
+				} else if (guess < number) {
+					System.out.println("The number is greater than " + guess);
+				} else {
+					System.out.println("The number is less than " + guess);
+				}
 			}
 
-			// Check conditions
-			if (guess == number) {
-				System.out.println(" Congratulations! You guessed the correct number.\n");
-
-				// Ask to replay
-				// Do you want to play again? (yes/no):
-
-				// Exit if guessed correctly
-				return;
-			} else if (guess < number) {
-				System.out.println(" The number is greater than " + guess);
-			} else {
-				System.out.println(" The number is less than " + guess);
+			if (!won) {
+				System.out.println("\nYou've exhausted your attempts. The number was: " + number);
 			}
-		}
 
-		System.out.println("\nYou've exhausted all attempts. The correct number was: " + number + "\n");
-		// Ask to replay, if yes, go back to the game, if no, end game
-		// Do you want to play again? (yes/no):
+			boolean validEndGameInput = false;
+			playAgain = false;
+
+			while (!validEndGameInput) {
+
+				System.out.print("Do you want to play again? (yes/no): ");
+				input.nextLine();
+				String response = input.nextLine().trim().toLowerCase();
+
+				if (response.equalsIgnoreCase("yes") || response.equalsIgnoreCase("y")) {
+					validEndGameInput = true;
+					playAgain = true;
+
+				} else if (response.equalsIgnoreCase("no") || response.equalsIgnoreCase("n")) {
+					validEndGameInput = true;
+					playAgain = false;
+
+				} else {
+					System.out.println("Invalid input: '" + response + "'.");
+				}
+			}
+
+			// TODO: guard the inputs. "yes/y" & "no/n" otherwise ask again
+			// System.out.print("Do you want to play again? (yes/no): ");
+			// input.nextLine();
+			// String response = input.nextLine().trim().toLowerCase();
+
+			// playAgain = response.equals("yes") || response.equals("y");
+
+		} while (playAgain);
+
+		System.out.println("Thanks for playing!");
+
+		// System.out.println("\nYou've exhausted all attempts. The correct number was:
+		// " + number + "\n");
+
 	}
 
 	public static void guessNumberUnlimitedSteps(Scanner input) {
