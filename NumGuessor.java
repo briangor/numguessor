@@ -1,8 +1,48 @@
 import java.util.Scanner;
 
 class NumGuessor {
+	static final int MIN_NUMBER = 1;
+	static final int MAX_NUMBER = 100;
+	static final int MAX_ATTEMPTS = 5;
+
+	// Integer.MIN_VALUE used so it can never collide with a real
+	// attempt count (positive = win, negative = loss, MIN_VALUE = quit)
+	static final int QUIT_SIGNAL = Integer.MIN_VALUE;
+
 	public static void main(String[] args) {
-		String gameIntroText = """
+		try (Scanner scan = new Scanner(System.in)) {
+			boolean running = true;
+
+			while (running) {
+				showMainMenu();
+				int gameMode = readGameMode(scan);
+
+				switch (gameMode) {
+					case 1 -> {
+						System.out.println("Game mode selected: Limited steps (" + MAX_ATTEMPTS + ")");
+						System.out.print("Please wait ...");
+						flushScreen();
+						guessNumber(scan);
+					}
+
+					case 2 -> {
+						System.out.println("Game mode selected: Unlimited steps");
+						System.out.print("Please wait ...");
+						flushScreen();
+						guessNumberUnlimitedSteps(scan);
+					}
+
+					case 0 -> {
+						System.out.println("Bye!");
+						running = false;
+					}
+				}
+			}
+		}
+	}
+
+	static void showMainMenu() {
+		System.out.println("""
 				-------------------------------------------------------------------------------
 								NumGuessor
 				-------------------------------------------------------------------------------
@@ -10,57 +50,32 @@ class NumGuessor {
 				A number will be chosen by the Elder gods and your task is to guess it.
 				You can select between the two game modes of limited steps or unlimited steps.
 				-------------------------------------------------------------------------------
-				""";
-		System.out.println(gameIntroText);
+				""");
 
 		System.out.println("Select the game mode (1 or 2. 0 to quit): ");
-		System.out.println("\t1) Limited steps (1 round of 5 attempts) ");
-		System.out.println("\t2) Unlimited steps (unlimited rounds of 5 attempts each) ");
+		System.out.println("\t1) Limited steps (1 round of " + MAX_ATTEMPTS + " attempts) ");
+		System.out.println("\t2) Unlimited steps (unlimited rounds of " + MAX_ATTEMPTS + " attempts each) ");
 		System.out.println("\t0) Quit game ");
 		System.out.print("> ");
+	}
 
-		try (Scanner scan = new Scanner(System.in)) {
-			int gameMode = 0;
-			boolean isValid = false;
+	static int readGameMode(Scanner scan) {
+		while (true) {
+			if (scan.hasNextInt()) {
+				int mode = scan.nextInt();
+				scan.nextLine();
 
-			while (!isValid) {
-				if (scan.hasNextInt()) {
-					gameMode = scan.nextInt();
-					// scan.nextLine(); // consumes leftover "Enter" keypress
-
-					if (gameMode == 1) {
-						System.out.println("Game mode selected: Limited steps (5)");
-						System.out.println("Please wait ...");
-						flushScreen();
-						guessNumber(scan);
-						isValid = true;
-					} else if (gameMode == 2) {
-						System.out.println("Game mode selected: Unlimited steps");
-						System.out.println("Please wait ...");
-						flushScreen();
-						guessNumberUnlimitedSteps(scan);
-						isValid = true;
-					} else if (gameMode == 0) {
-						// Quit game
-						System.out.println("Bye");
-						return;
-
-					} else {
-						System.out.println("Invalid Mode: " + gameMode + ". Please choose 1 or 2.");
-						System.out.print("> ");
-					}
-
-				} else {
-					String invalidInput = scan.next();
-					System.out.println("Error: '" + invalidInput + "' is not a valid number. Try again.");
-					System.out.print("> ");
-				}
+				if (mode >= 0 && mode <= 2)
+					return mode;
+				System.out.println("Invalid Mode: " + mode + ". Please choose 1, 2, or 0.");
+			} else {
+				System.out.println("Error: '" + scan.next() + "' is not a valid number. Try again.");
 			}
-
+			System.out.print("> ");
 		}
 	}
 
-	public static void flushScreen() {
+	static void flushScreen() {
 		try {
 			Thread.sleep(3000); // Wait for 3000 milliseconds (3 seconds)
 		} catch (InterruptedException e) {
@@ -70,177 +85,171 @@ class NumGuessor {
 		System.out.flush();
 	}
 
-	public static void guessNumber(Scanner input) {
+	// ============================================
+	// SHARED HELPER
+	// ============================================
+	/**
+	 * Plays one round of up to MAX_ATTEMPTS guesses for the given number
+	 * 
+	 * @param input  the active Scanner
+	 * @param number the secret number the player must guess
+	 * @return positive attemptsUsed if the player guessed correctly
+	 *         negative attemptsUsed if they exhausted all attempts
+	 */
+	static int playRound(Scanner input, int number) {
+		int attemptsUsed = 0;
 
-		boolean playAgain = false;
+		while (attemptsUsed < MAX_ATTEMPTS) {
+			if (attemptsUsed == MAX_ATTEMPTS - 1)
+				System.out.println("Last chance remaining!");
+			System.out.print("Enter your guess: ");
+
+			String rawInput = input.next();
+			input.nextLine();
+
+			if (rawInput.equalsIgnoreCase("quit") || rawInput.equalsIgnoreCase("q")) {
+				return QUIT_SIGNAL;
+			}
+
+			int guess;
+			try {
+				guess = Integer.parseInt(rawInput);
+			} catch (NumberFormatException e) {
+				System.out.println(">> '" + rawInput + "' is not a valid number. Try again.\n");
+				continue;
+			}
+
+			if (guess < MIN_NUMBER || guess > MAX_NUMBER) {
+				System.out.println(">> The number is within the range of " + MIN_NUMBER + " to " + MAX_NUMBER
+						+ ". You still have " + (MAX_ATTEMPTS - attemptsUsed) + " attempts.\n");
+				continue;
+			}
+
+			attemptsUsed++;
+
+			if (guess == number) {
+				return attemptsUsed;
+			} else if (guess < number) {
+				System.out.println("The number is greater than " + guess + "\n");
+			} else {
+				System.out.println("The number is less than " + guess + "\n");
+			}
+		}
+
+		return -attemptsUsed;
+	}
+
+	// ==
+	// SHARED HELPER: yes/no prompt used by all game modes
+	// ==
+	static boolean askYesNo(Scanner input, String prompt) {
+		while (true) {
+			System.out.print(prompt + " (yes/no): ");
+			String response = input.nextLine().trim().toLowerCase();
+			if (response.equals("yes") || response.equals("y"))
+				return true;
+			if (response.equals("no") || response.equals("n"))
+				return false;
+			System.out.println("Invalid input: '" + response + "'. Please enter yes or no.");
+		}
+	}
+
+	static void guessNumber(Scanner input) {
+
+		boolean playAgain;
 
 		do {
 			// Reset game state for a new round
 			// Generate a random number between 1 and 100
-			int number = 1 + (int) (100 * Math.random());
+			int number = MIN_NUMBER + (int) ((MAX_NUMBER - MIN_NUMBER + 1) * Math.random());
 
-			// Number of attempts
-			final int MAX_ATTEMPTS = 5;
-			int attemptsUsed = 0;
-
-			boolean won = false;
-
-			System.out.println("A number is chosen between 1 and 100.");
+			System.out.println("A number is chosen between " + MIN_NUMBER + " and " + MAX_NUMBER + ".");
 			System.out.println("You have " + MAX_ATTEMPTS + " attempts to guess the correct number");
+			System.out.println("To quit and return to the main menu, type 'quit'\n");
 
-			// The guessing loop: runs until attempts are exhausted OR the user wins
-			while (attemptsUsed < MAX_ATTEMPTS) {
-				if (attemptsUsed == MAX_ATTEMPTS - 1)
-					System.out.println("Last chance remaining!");
+			int result = playRound(input, number);
 
-				System.out.print("Enter your guess: ");
-
-				String rawInput = input.next();
-				input.nextLine();
-
-				int guess;
-
-				try {
-					guess = Integer.parseInt(rawInput);
-				} catch (NumberFormatException e) {
-					System.out.println(">> '" + rawInput + "' is not a valid number. Try again.\n");
-					continue;
-				}
-
-				if (guess == number) {
-					System.out.println("Congratulations! You guessed it.\n");
-					won = true;
-					attemptsUsed++;
-					break;
-				} else if (guess > 100 || guess < 0) {
-					System.out.println(">> The number is within the range of 0 to 100. You still have "
-							+ (MAX_ATTEMPTS - attemptsUsed) + " attempts.\n");
-					continue;
-				} else if (guess < number) {
-					System.out.println("The number is greater than " + guess + "\n");
-				} else {
-					System.out.println("The number is less than " + guess + "\n");
-				}
-				attemptsUsed++;
+			if (result == QUIT_SIGNAL) {
+				System.out.print("\nReturning to the main menu ...");
+				flushScreen();
+				return;
 			}
 
-			if (!won) {
-				System.out.println("You've exhausted your attempts. The number was: " + number);
+			if (result > 0) {
+				System.out.println("Congratulations! You have guessed it in " + result + " attempt(s).\n");
+			} else {
+				System.out.println("You've exhausted your attempts. The number was: " + number + "\n");
 			}
 
-			boolean validEndGameInput = false;
+			playAgain = askYesNo(input, "Do you want to play again?");
 
-			while (!validEndGameInput) {
-
-				System.out.print("Do you want to play again? (yes/no): ");
-				String response = input.nextLine().trim().toLowerCase();
-
-				if (response.equals("yes") || response.equals("y")) {
-					System.out.println("Please wait ...");
-					flushScreen();
-					validEndGameInput = true;
-					playAgain = true;
-				} else if (response.equals("no") || response.equals("n")) {
-					validEndGameInput = true;
-					playAgain = false;
-				} else {
-					System.out.println("Invalid input: '" + response + "'.");
-				}
+			if (playAgain) {
+				System.out.print("Please wait ...");
+				flushScreen();
 			}
+
 		} while (playAgain);
 
-		System.out.println("Thanks for playing!");
-
+		System.out.print("Thanks for playing! Returning to the main menu ...");
+		flushScreen();
 	}
 
 	public static void guessNumberUnlimitedSteps(Scanner input) {
-		// Generate a random number between 1 and 100
-		int number = 1 + (int) (100 * Math.random());
+		boolean playAgain;
 
-		// Track number of attempts
-		int attempts = 0;
+		do {
+			int number = MIN_NUMBER + (int) ((MAX_NUMBER - MIN_NUMBER + 1) * Math.random());
+			int totalAttempts = 0;
+			boolean guessedCorrectly = false;
+			boolean playerQuit = false;
 
-		// Maximum attempts per round
-		int K = 5;
-		// final int MAX_ATTEMPTS = 5; // use this var
-		boolean guessedCorrectly = false;
+			System.out.println("A number is chosen between " + MIN_NUMBER + " and " + MAX_NUMBER + ".");
+			System.out.println("You have " + MAX_ATTEMPTS + " attempts per round to guess the correct number.");
+			System.out.println("To quit and return to the main menu, type 'quit'\n");
 
-		System.out.println("A number is chosen between 1 and 100.");
-		System.out.println("You have " + K + " attempts per round to guess the correct number.");
+			while (!guessedCorrectly) {
+				int result = playRound(input, number);
 
-		while (!guessedCorrectly) {
-			int roundAttempts = 0;
-
-			// Give the user K attempts per round
-			while (roundAttempts < K) {
-				if (roundAttempts == K - 1)
-					System.out.println("Last chance in this round!");
-
-				System.out.print("Enter your guess: ");
-
-				String rawInput = input.next();
-				input.nextLine();
-
-				int guess;
-
-				try {
-					guess = Integer.parseInt(rawInput);
-				} catch (NumberFormatException e) {
-					System.out.println(">> '" + rawInput + "' is not a valid number. Try again.\n");
-					continue;
-				}
-
-				if (guess > 100 || guess < 0) {
-					System.out.println(">> The number is within the range of 0 to 100. You still have "
-							+ (K - roundAttempts) + " attempts in this round.\n");
-					continue;
-				}
-
-				attempts++;
-				roundAttempts++;
-
-				if (guess == number) {
-					System.out.println("Congratulations! You guessed the correct number in " + attempts + " attempts.");
-					guessedCorrectly = true;
+				if (result == QUIT_SIGNAL) {
+					System.out.print("\nReturning to the main menu ...");
+					playerQuit = true;
 					break;
-				} else if (guess < number) {
-					System.out.println("The number is greater than " + guess + "\n");
-				} else {
-					System.out.println("The number is less than " + guess + "\n");
 				}
-			}
 
-			if (!guessedCorrectly) {
-				// Ask the user if they want to continue
-				// after exhausting K attempts
-				System.out.println("You have used all " + K + " attempts.");
+				totalAttempts += Math.abs(result);
 
-				boolean validEndGameInput = false;
-
-				while (!validEndGameInput) {
-					System.out.println("Do you want to continue guessing? (yes/no): ");
-					String response = input.nextLine().trim().toLowerCase();
-
-					if (response.equals("yes") || response.equals("y")) {
-						validEndGameInput = true;
-
-					} else if (response.equals("no") || response.equals("n")) {
-						System.out.println("Game Over! The correct number was: " + number);
-
-						return; // Or use System.exit(0) to stop the program entirely.
-					} else {
-						System.out.println("Invalid input: '" + response + "'.");
+				if (result > 0) {
+					System.out.println("Congratulations! You have guessed the correct number in "
+							+ totalAttempts + " total attempt(s).\n");
+					guessedCorrectly = true;
+				} else {
+					System.out.println("You have used all " + MAX_ATTEMPTS + " attempts in this round.");
+					if (!askYesNo(input, "Do you want to continue guessing?")) {
+						System.out.println("Game Over! The correct number was: " + number + "\n");
+						break;
 					}
 				}
 			}
 
-		}
+			if (playerQuit) {
+				flushScreen();
+				return;
+			}
+
+			playAgain = askYesNo(input, "Do you want to play again?");
+			if (playAgain) {
+				System.out.print("Please wait ...");
+				flushScreen();
+			}
+		} while (playAgain);
+
+		System.out.print("Thanks for playing! Returning to the main menu ...");
+		flushScreen();
 	}
 }
 
-/*
- * TODO:
- * - allow the user to navigate between game modes after the game finishes
+/**
+ * # TODO:
  * 
  * 
  */
