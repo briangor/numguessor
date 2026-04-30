@@ -1,0 +1,12 @@
+# Compiled Java
+*.class
+
+# Packaged JAR
+*.jar
+
+# jpackage output
+*.exe
+*.msi
+manifest.txt
+
+.env
