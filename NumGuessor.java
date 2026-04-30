@@ -14,8 +14,8 @@ class NumGuessor {
 		System.out.println(gameIntroText);
 
 		System.out.println("Select the game mode (1 or 2. 0 to quit): ");
-		System.out.println("\t1) Limited steps (5) ");
-		System.out.println("\t2) Unlimited steps ");
+		System.out.println("\t1) Limited steps (1 round of 5 attempts) ");
+		System.out.println("\t2) Unlimited steps (unlimited rounds of 5 attempts each) ");
 		System.out.println("\t0) Quit game ");
 		System.out.print("> ");
 
@@ -94,6 +94,9 @@ class NumGuessor {
 			if (guess == number) {
 				System.out.println(" Congratulations! You guessed the correct number.\n");
 
+				// Ask to replay
+				// Do you want to play again? (yes/no):
+
 				// Exit if guessed correctly
 				return;
 			} else if (guess < number) {
@@ -104,7 +107,8 @@ class NumGuessor {
 		}
 
 		System.out.println("\nYou've exhausted all attempts. The correct number was: " + number + "\n");
-
+		// Ask to replay, if yes, go back to the game, if no, end game
+		// Do you want to play again? (yes/no):
 	}
 
 	public static void guessNumberUnlimitedSteps(Scanner input) {
@@ -131,6 +135,9 @@ class NumGuessor {
 				if (guess == number) {
 					System.out.println("Congratulations! You guessed the correct number in " + attempts + " attempts.");
 					guessedCorrectly = true;
+					// Ask to replay
+					// Do you want to play again? (yes/no):
+
 					break;
 				} else if (guess < number) {
 					System.out.println("The number is greater than " + guess);
