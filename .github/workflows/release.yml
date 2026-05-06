@@ -128,18 +128,18 @@ jobs:
 
       - name: Build Linux .deb
         run: |
-          jpackage --input . \
-                   --main-jar NumGuessor.jar \
-                   --main-class NumGuessor \
-                   --name NumGuessor \
-                   --type deb \
-                   --icon assets/icons/NumGuessor.png \
-                   --app-version ${{ steps.version.outputs.VERSION }} \
-                   --vendor "0xb13" \
-                   --description "A number guessing game" \
-                   --copyright "Copyright 2026 0xb13" \
-                   --linux-shortcut \
-                   --linux-menu-group "Games" \
+          jpackage --input .
+                   --main-jar NumGuessor.jar
+                   --main-class NumGuessor
+                   --name NumGuessor
+                   --type deb
+                   --icon assets/icons/NumGuessor.png
+                   --app-version ${{ steps.version.outputs.VERSION }}
+                   --vendor "0xb13"
+                   --description "A number guessing game"
+                   --copyright "Copyright 2026 0xb13"
+                   --linux-shortcut
+                   --linux-menu-group "Games"
                    --linux-app-category "Game"
 
       - name: Upload Linux artifact
@@ -179,16 +179,16 @@ jobs:
 
       - name: Build macOS .dmg
         run: |
-          jpackage --input . \
-                   --main-jar NumGuessor.jar \
-                   --main-class NumGuessor \
-                   --name NumGuessor \
-                   --type dmg \
-                   --icon assets/icons/NumGuessor.icns \
-                   --app-version ${{ steps.version.outputs.VERSION }} \
-                   --vendor "0xb13" \
-                   --description "A number guessing game" \
-                   --copyright "Copyright 2026 0xb13" \
+          jpackage --input .
+                   --main-jar NumGuessor.jar
+                   --main-class NumGuessor
+                   --name NumGuessor
+                   --type dmg
+                   --icon assets/icons/NumGuessor.icns
+                   --app-version ${{ steps.version.outputs.VERSION }}
+                   --vendor "0xb13"
+                   --description "A number guessing game"
+                   --copyright "Copyright 2026 0xb13"
                    --mac-package-name "NumGuessor"
                    --mac-package-identifier "com.0xb13.numguessor"
 
