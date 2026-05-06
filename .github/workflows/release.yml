@@ -149,7 +149,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux-installer
-          path: NumGuessor_*.deb
+          path: "*.deb"
 
 
   # ===========================================================================
@@ -202,7 +202,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: macos-installer
-          path: NumGuessor-*.dmg
+          path: "*.dmg"
 
 
   # ===========================================================================
@@ -251,6 +251,6 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            NumGuessor-*.exe
-            NumGuessor_*.deb
-            NumGuessor-*.dmg
+            *.exe
+            *.deb
+            *.dmg
