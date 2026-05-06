@@ -7,6 +7,22 @@
 # jpackage output
 *.exe
 *.msi
-manifest.txt
+*.deb
+*.rpm
+*.dmg
+*.pkg
 
+# jpackage working directory
+out/
+
+manifest.txt
 .env
+
+.DS_Store
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+Thumbs.db
