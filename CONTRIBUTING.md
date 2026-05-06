@@ -86,7 +86,7 @@ Go to the original NumGuessor repo and click **"Compare & pull request"**.
 
 Describe what your change does and why. If it fixes a bug, reference the issue:
 ```
-Fixes #12 — corrected range validation to exclude 0 as a valid guess
+Fixes #12 - corrected range validation to exclude 0 as a valid guess
 ```
 
 ---
@@ -111,14 +111,14 @@ You do not need to update the version yourself. That is handled by the maintaine
 
 ## Planned Features (Good First Contributions)
 
-These are features already on the roadmap — great starting points if you are looking for something to work on:
+These are features already on the roadmap. Great starting points if you are looking for something to work on:
 
 - [ ] High score tracking saved to a file
 - [ ] Score ranking based on attempts (e.g. *God Mode*, *Close Call*)
 - [ ] Difficulty settings (adjustable range and attempt limits)
 - [ ] Hint system (*"You're getting warmer!"*)
 - [ ] In-game timer
-- [ ] Coloured terminal output
+- [ ] Colored terminal output
 
 ---
 

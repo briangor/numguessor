@@ -1,0 +1,142 @@
+name: Test Build
+
+# =============================================================================
+# TRIGGER
+# Runs on every push to the test branch only.
+# Does NOT publish a release or attach any installers anywhere.
+# Purpose: verify the build succeeds on all three platforms before tagging.
+# =============================================================================
+on:
+  push:
+    branches:
+      - test
+
+jobs:
+
+  # ===========================================================================
+  # JOB 1 — WINDOWS BUILD CHECK
+  # ===========================================================================
+  build-windows:
+    name: Windows Build Check
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: Install WiX Toolset
+        run: |
+          curl -fsSL -o wix314.exe https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314.exe
+          Start-Process -FilePath wix314.exe -ArgumentList "/quiet" -Wait
+          echo "C:\Program Files (x86)\WiX Toolset v3.14\bin" >> $env:GITHUB_PATH
+        shell: pwsh
+
+      - name: Compile Java source
+        run: javac src/NumGuessor.java -d out/
+
+      - name: Create JAR
+        run: jar cfe NumGuessor.jar NumGuessor -C out/ .
+
+      - name: Build Windows .exe
+        run: |
+          jpackage --input . `
+                   --main-jar NumGuessor.jar `
+                   --main-class NumGuessor `
+                   --name NumGuessor `
+                   --type exe `
+                   --win-console `
+                   --icon assets/icons/NumGuessor.ico `
+                   --app-version 1.0.0 `
+                   --vendor "0xb13" `
+                   --description "A number guessing game" `
+                   --copyright "Copyright 2026 0xb13" `
+                   --win-shortcut `
+                   --win-menu `
+                   --win-menu-group "Games" `
+                   --win-upgrade-uuid ${{ secrets.WIN_UPGRADE_UUID }}
+        shell: pwsh
+
+
+  # ===========================================================================
+  # JOB 2 — LINUX BUILD CHECK
+  # ===========================================================================
+  build-linux:
+    name: Linux Build Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: Compile Java source
+        run: javac src/NumGuessor.java -d out/
+
+      - name: Create JAR
+        run: jar cfe NumGuessor.jar NumGuessor -C out/ .
+
+      - name: Build Linux .deb
+        run: |
+          jpackage --input . \
+                   --main-jar NumGuessor.jar \
+                   --main-class NumGuessor \
+                   --name NumGuessor \
+                   --type deb \
+                   --icon assets/icons/NumGuessor.png \
+                   --app-version 1.0.0 \
+                   --vendor "0xb13" \
+                   --description "A number guessing game" \
+                   --copyright "Copyright 2026 0xb13" \
+                   --linux-shortcut \
+                   --linux-menu-group "Games" \
+                   --linux-app-category "Game"
+
+
+  # ===========================================================================
+  # JOB 3 — MACOS BUILD CHECK
+  # ===========================================================================
+  build-macos:
+    name: macOS Build Check
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: Compile Java source
+        run: javac src/NumGuessor.java -d out/
+
+      - name: Create JAR
+        run: jar cfe NumGuessor.jar NumGuessor -C out/ .
+
+      - name: Build macOS .dmg
+        run: |
+          jpackage --input . \
+                   --main-jar NumGuessor.jar \
+                   --main-class NumGuessor \
+                   --name NumGuessor \
+                   --type dmg \
+                   --icon assets/icons/NumGuessor.icns \
+                   --app-version 1.0.0 \
+                   --vendor "0xb13" \
+                   --description "A number guessing game" \
+                   --copyright "Copyright 2026 0xb13" \
+                   --mac-package-name "NumGuessor" \
+                   --mac-package-identifier "com.0xb13.numguessor"
