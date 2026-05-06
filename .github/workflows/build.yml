@@ -52,7 +52,7 @@ jobs:
                    --type exe `
                    --win-console `
                    --icon assets/icons/NumGuessor.ico `
-                   --app-version 0.0.0 `
+                   --app-version 1.0.0 `
                    --vendor "0xb13" `
                    --description "A number guessing game" `
                    --copyright "Copyright 2026 0xb13" `
@@ -94,7 +94,7 @@ jobs:
                    --name NumGuessor \
                    --type deb \
                    --icon assets/icons/NumGuessor.png \
-                   --app-version 0.0.0 \
+                   --app-version 1.0.0 \
                    --vendor "0xb13" \
                    --description "A number guessing game" \
                    --copyright "Copyright 2026 0xb13" \
@@ -134,7 +134,7 @@ jobs:
                    --name NumGuessor \
                    --type dmg \
                    --icon assets/icons/NumGuessor.icns \
-                   --app-version 0.0.0 \
+                   --app-version 1.0.0 \
                    --vendor "0xb13" \
                    --description "A number guessing game" \
                    --copyright "Copyright 2026 0xb13" \
